@@ -1,6 +1,16 @@
 #ifndef _hal_hpp_
 #define _hal_hpp_
 
+// Setting hw config and regional parameters
+#define CFG_eu868 1
+#define CFG_sx1276_radio 1
+
+typedef struct {
+    u1_t nss;
+    u1_t rst;
+    u1_t dio[3];  // DIO0, DIO1, DIO2
+    u1_t spi[3];  // MISO, MOSI, SCK
+} lmic_pinmap_t;
 /*
  * initialize hardware (IO, SPI, TIMER, IRQ).
  */
