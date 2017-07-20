@@ -19,6 +19,7 @@ spi_device_handle_t spi_handle;
 
 static void io_init () {
 
+  ESP_LOGI(TAG, "Starting IO initialization");
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
@@ -30,6 +31,7 @@ static void io_init () {
     io_conf.mode = GPIO_MODE_INPUT;
     io_conf.pin_bit_mask = (1<<pins.dio[0]) | (1<<pins.dio[1]) | (1<<pins.dio[2]);
     gpio_config(&io_conf);
+  ESP_LOGE(TAG, "Ending IO initialization");
 
 }
 
@@ -46,17 +48,20 @@ static void spi_init () {
 
     spi_device_interface_config_t devcfg={
         .clock_speed_hz = 10000000,
-        .mode = 0, // clock mode CPOL 0 and CPHA 0, which corresponds to mode0
-        /*.mode = 1,*/
+        /*.mode = 0, // clock mode CPOL 0 and CPHA 0, which corresponds to mode0*/
+        .mode = 1,
         .spics_io_num = -1,
         .queue_size = 7,
     };
 
+    ESP_LOGE(TAG, "Starting SPI initialization");
     ret = spi_bus_initialize(HSPI_HOST, &buscfg, 1);
     assert(ret == ESP_OK);
 
+
     ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi_handle);
     assert(ret == ESP_OK);
+
 }
 
 void hal_pin_nss (u1_t val) {
@@ -127,8 +132,10 @@ u1_t hal_spi (u1_t outval) {
     spi_tr.rxlength = 8;
     spi_tr.tx_buffer = &outval;
     spi_tr.rx_buffer = &rx_data;
+    ESP_LOGE("Prout", "blewur");
 
     esp_err_t ret = spi_device_transmit(spi_handle, &spi_tr);
+    ESP_LOGE("Prout", "dfjglskdf");
     assert(ret == ESP_OK);
 
     return (u1_t) rx_data;
@@ -204,6 +211,8 @@ void hal_enableIRQs () {
 
 void hal_failed () {
     hal_disableIRQs();
+    hal_sleep();
+    while(1);
 }
 
 void hal_sleep () {

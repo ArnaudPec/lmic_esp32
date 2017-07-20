@@ -26,6 +26,7 @@
  */
 
 #include "lmic.h"
+#include "esp_log.h"
 
 // ----------------------------------------
 // Registers Mapping
@@ -411,7 +412,7 @@ static void configLoraModem () {
 
 static void configChannel () {
     // set frequency: FQ = (FRF * 32 Mhz) / (2 ^ 19)
-    u8_t frf = ((u8_t)LMIC.freq << 19) / 32000000;
+    ll_u8_t frf = ((ll_u8_t)LMIC.freq << 19) / 32000000;
     writeReg(RegFrfMsb, (u1_t)(frf>>16));
     writeReg(RegFrfMid, (u1_t)(frf>> 8));
     writeReg(RegFrfLsb, (u1_t)(frf>> 0));
@@ -685,6 +686,7 @@ void radio_init () {
     u1_t v = readReg(RegVersion);
 #ifdef CFG_sx1276_radio
     ASSERT(v == 0x12 );
+    ESP_LOGE("Prout", "SX1276")
 #elif CFG_sx1272_radio
     ASSERT(v == 0x22);
 #else
@@ -769,7 +771,8 @@ void radio_irq_handler (u1_t dio) {
     u1_t c = readReg(LORARegModemConfig2);
     opmode(OPMODE_TX);
     return;
-#else /* ! CFG_TxContinuousMode */
+#endif
+/*#else [> ! CFG_TxContinuousMode <]*/
     ostime_t now = os_getTime();
     if( (readReg(RegOpMode) & OPMODE_LORA) != 0) { // LORA modem
         u1_t flags = readReg(LORARegIrqFlags);
@@ -827,7 +830,7 @@ void radio_irq_handler (u1_t dio) {
     opmode(OPMODE_SLEEP);
     // run os job (use preset func ptr)
     os_setCallback(&LMIC.osjob, LMIC.osjob.func);
-#endif /* ! CFG_TxContinuousMode */
+/*#endif [> ! CFG_TxContinuousMode <]*/
 }
 
 void os_radio (u1_t mode) {

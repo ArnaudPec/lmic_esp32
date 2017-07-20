@@ -167,7 +167,7 @@ struct lmic_t {
     u1_t        rxsyms;
     u1_t        dndr;
     s1_t        txpow;     // dBm
-    s8_t        rxDelay;
+    ll_u8_t        rxDelay;
 
     osjob_t     osjob;
 
