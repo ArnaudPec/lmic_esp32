@@ -565,11 +565,10 @@ static void initDefaultChannels (bit_t join) {
         LMIC.channelFreq[fu]  = iniChannelFreq[su];
         LMIC.channelDrMap[fu] = DR_RANGE_MAP(DR_SF12,DR_SF7);
     }
-// IBM LMIC had:
-//    if( !join ) {
-//        LMIC.channelDrMap[5] = DR_RANGE_MAP(DR_SF12,DR_SF7);
-//        LMIC.channelDrMap[1] = DR_RANGE_MAP(DR_SF12,DR_FSK);
-//    }
+    if( !join ) {
+        LMIC.channelDrMap[5] = DR_RANGE_MAP(DR_SF12,DR_SF7);
+        LMIC.channelDrMap[1] = DR_RANGE_MAP(DR_SF12,DR_FSK);
+    }
 
     LMIC.bands[BAND_MILLI].txcap    = 1000;  // 0.1%
     LMIC.bands[BAND_MILLI].txpow    = 14;

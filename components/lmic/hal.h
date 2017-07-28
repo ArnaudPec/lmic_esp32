@@ -1,6 +1,8 @@
 #ifndef _hal_hpp_
 #define _hal_hpp_
 
+static const char* TAG = "LMIC_HAL";
+
 // Setting hw config and regional parameters
 #define CFG_eu868 1
 #define CFG_sx1276_radio 1

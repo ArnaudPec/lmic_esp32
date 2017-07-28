@@ -1,25 +1,26 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
-
 #include "esp_event.h"
 #include "esp_event_loop.h"
-
 #include "nvs_flash.h"
-
 #include "lmic.h"
 
-// Defining keys and devadress
-u1_t NWKSKEY[16] = { 0x31, 0xDA, 0xEF, 0x09, 0x56, 0xEB, 0x8E, 0xA6, 0xB3, 0x8F, 0xDC, 0x72, 0xB1, 0xEE, 0xE6, 0x69 };
-u1_t APPSKEY[16] = { 0x7C, 0x34, 0x7E, 0x65, 0x93, 0x26, 0x90, 0x79, 0x5B, 0x46, 0xBC, 0x7E, 0xEA, 0x16, 0x88, 0x83 };
-u4_t DEVADDR = 0x460115D8 ;
+// LSBf
+u1_t NWKSKEY[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+// LSBf
+u1_t APPSKEY[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+// MSBf
+u4_t DEVADDR = 0;
 
 void os_getArtEui (u1_t* buf) { }
 void os_getDevEui (u1_t* buf) { }
 void os_getDevKey (u1_t* buf) { }
 
 // Test data and sending interval
-static uint8_t mydata[] = "test";
+static uint8_t mydata[] = "0";
 const unsigned TX_INTERVAL = 30;
 
 void onEvent (ev_t ev) {
@@ -66,7 +67,6 @@ void onEvent (ev_t ev) {
             if (LMIC.opmode & OP_TXRXPEND) {
                 printf("OP_TXRXPEND, not sending");
             } else {
-                // Prepare upstream data transmission at the next possible time.
                 LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 0);
                 printf("Packet queued");
             }
@@ -78,7 +78,6 @@ void onEvent (ev_t ev) {
             printf("EV_RESET");
             break;
         case EV_RXCOMPLETE:
-            // data received in ping slot
             printf("EV_RXCOMPLETE");
             break;
         case EV_LINK_DEAD:
@@ -97,12 +96,12 @@ esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     return ESP_OK;
 }
+
 void os_runloop(void *pvParameter) {
 
     if (LMIC.opmode & OP_TXRXPEND) {
         printf("OP_TXRXPEND, not sending");
     } else {
-        // Prepare upstream data transmission at the next possible time.
         LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 0);
         printf("Packet queued");
     }
@@ -116,10 +115,8 @@ void os_runloop(void *pvParameter) {
 void app_main(void)
 {
     os_init();
-    printf("%s\n", "coucou");
     LMIC_reset();
 
-    printf("%s\n", "coucou1");
     uint8_t appskey[sizeof(APPSKEY)];
     uint8_t nwkskey[sizeof(NWKSKEY)];
     memcpy(appskey, APPSKEY, sizeof(APPSKEY));

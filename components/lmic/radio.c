@@ -686,7 +686,6 @@ void radio_init () {
     u1_t v = readReg(RegVersion);
 #ifdef CFG_sx1276_radio
     ASSERT(v == 0x12 );
-    ESP_LOGE("Prout", "SX1276")
 #elif CFG_sx1272_radio
     ASSERT(v == 0x22);
 #else
